@@ -107,7 +107,7 @@ out_roll_coor = 0.0
 out_pitch_coor = 0.0
 
 # i = 1 #Variabel pointer dari file
-# file = open('track_data.txt','w') #Membuka file external yang berisi data track kereta api 
+file = open('track_data.txt','w') #Membuka file external yang berisi data track kereta api 
 
 #Motion Cueing
 for x in range(0, 10000) :
@@ -168,12 +168,12 @@ for x in range(0, 10000) :
 	out22_sway_1 = out22_sway
 	
 	#integrator menjadi kecepatan simulator
-	v_surge = v_surge + (1/500)*(out22_surge+out22_surge_1)/2
-	v_sway = v_sway + + (1/500)*(out22_sway+out22_sway_1)/2
+	v_surge = v_surge + (0.002)*(out22_surge+out22_surge_1)/2
+	v_sway = v_sway + + (0.002)*(out22_sway+out22_sway_1)/2
 	
 	#integrator menjadi posisi simulator
-	pos_surge = pos_surge + (1/500)*(v_surge+v_surge_1)/2
-	pos_sway = pos_sway + (1/500)*(v_sway+v_sway_1)/2
+	pos_surge = pos_surge + (0.002)*(v_surge+v_surge_1)/2
+	pos_sway = pos_sway + (0.002)*(v_sway+v_sway_1)/2
 	
 	#update nilai kecepatan
 	v_surge_1 = v_surge
@@ -224,20 +224,20 @@ for x in range(0, 10000) :
 	out12_pitch = math.asin(out12_surge/9.8)
 	
 	#Rate Limiter
-	rate_roll = (out12_roll-out_roll_coor)/(1/500)
-	rate_pitch = (out12_pitch-out_roll_pitch)/(1/500)
+	rate_roll = (out12_roll-out_roll_coor)/(0.002)
+	rate_pitch = (out12_pitch-out_roll_coor)/(0.002)
 	
 	if rate_roll>0.2 :
-		out_roll_coor = (1/500)*0.2 + out_roll_coor
+		out_roll_coor = (0.002)*0.2 + out_roll_coor
 	elif rate_roll<-0.2 :
-		out_roll_coor = (1/500)*(-0.2) + out_roll_coor
+		out_roll_coor = (0.002)*(-0.2) + out_roll_coor
 	else :
 		out_roll_coor = out12_roll
 	
 	if rate_pitch>0.2 :
-		out_pitch_coor = (1/500)*0.2 + out_pitch_coor
+		out_pitch_coor = (0.002)*0.2 + out_pitch_coor
 	elif rate_pitch<-0.2 :
-		out_pitch_coor = (1/500)*(-0.2) + out_pitch_coor
+		out_pitch_coor = (0.002)*(-0.2) + out_pitch_coor
 	else :
 		out_pitch_coor = out12_pitch
 	
@@ -285,8 +285,6 @@ for x in range(0, 10000) :
 	out_pitch = out_pitch_coor + out11_pitch
 	
 	#Proses penulisan file
-	file.write(str(out22_surge) + '\t' + str(out22_sway) + '\t' + str(out12_surge) + '\t' + str(out12_sway) + '\t' + str(out11_roll) + '\t' + str(out11_pitch) + '\t' + str(in11_roll) +'\n')
-	
-	i = i+1
+	file.write(str(out22_surge) + '\t' + str(out22_sway) + '\t' + str(v_surge) + '\t' + str(v_sway) + '\t' + str(pos_surge) + '\t' + str(pos_sway) + '\t' + str(out_roll) + '\t' + str(out_pitch) +'\n')
 	
 file.close()
