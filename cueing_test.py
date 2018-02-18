@@ -112,9 +112,12 @@ file = open('track_data.txt','w') #Membuka file external yang berisi data track 
 #Motion Cueing
 for x in range(0, 10000) :
 
-	in_surge = in_sway = 10
-	# in12_surge = in12_sway = 
-	in_pitch = in_roll = 0.25
+	if x<=5000 :
+		in_surge = in_sway = 0.001*x
+		in_pitch = in_roll = 0.00005*x
+	else :
+		in_surge = in_sway = 10-(0.001*x)
+		in_pitch = in_roll = 0.5-(0.00005*x)
 	
 	# #******Baca data percepatan dan lokasi kereta dari Rabbit MQ******
 	# in_asway #input Percepatan  sway
@@ -129,22 +132,22 @@ for x in range(0, 10000) :
 	
 	#******Translational channel******
 	#Scale and Limit, ubah in_asway dan in_asurge menjadi in22_sway dan in22_sway
-	in_surge = in_surge*0.45
-	in_sway = in_sway*0.35
+	in22_surge = in_surge*0.45
+	in22_sway = in_sway*0.35
 	
-	if in_sway<-1.3 :
+	if in22_sway<-1.3 :
 		in22_sway = -1.3
-	elif in_sway>1.3 :
+	elif in22_sway>1.3 :
 		in22_sway = 1.3
 	else :
-		in22_sway = in_sway
+		in22_sway = in22_sway
 	
-	if in_surge<-1.8 :
+	if in22_surge<-1.8 :
 		in22_surge = -1.8
-	elif in_surge>1.8 :
+	elif in22_surge>1.8 :
 		in22_surge = 1.8
 	else :
-		in22_surge = in_surge
+		in22_surge = in22_surge
 	
 	#Filter highpass W22
 	out22_surge = -(-0.960580095921472)*out22_surge_3 - 2.92110855188490*out22_surge_2 - (-2.96052837624337)*out22_surge_1 +  (-0.980277128006217)*in22_surge_3 + 2.94083138401865*in22_surge_2 + (-2.94083138401865)*in22_surge_1 + (0.980277128006217)*in22_surge
@@ -181,25 +184,26 @@ for x in range(0, 10000) :
 	
 	#******Coordination channel******
 	#Scale and Limit
-	in_surge = in_surge*0.3
-	in_sway = in_sway*0.2
+	in12_surge = in_surge*0.3
+	in12_sway = in_sway*0.2
 	
-	if in_sway<-0.5 :
+	if in12_sway<-0.5 :
 		in12_sway = -0.5
-	elif in_sway>0.8 :
+	elif in12_sway>0.8 :
 		in12_sway = 0.8
 	else :
-		in12_sway = in_sway
+		in12_sway = in12_sway
 	
-	if in_surge<-1.2 :
+	if in12_surge<-1.2 :
 		in12_surge = -1.2
-	elif in_surge>1.2 :
+	elif in12_surge>1.2 :
 		in12_surge = 1.2
 	else :
-		in12_surge = in_surge
+		in12_surge = in12_surge
 	
 	#Filter lowpass W12
-	out12_surge = -0.752804997893585*out12_surge_4 -(-3.22480441374259)*out12_surge_3 - 5.18840245279824*out12_surge_2 - (-3.71628187421257)*out12_surge_1 + 7.57267104144893e-06*in12_surge_4 + 3.02906841657957e-05*in12_surge_3 + 4.54360262486936e-05*in12_surge_2 + 3.02906841657957e-05*in12_surge_1 + 7.57267104144893e-06*in12_surge
+	#out12_surge = -0.752804997893585*out12_surge_4 -(-3.22480441374259)*out12_surge_3 - 5.18840245279824*out12_surge_2 - (-3.71628187421257)*out12_surge_1 + 7.57267104144893e-06*in12_surge_4 + 3.02906841657957e-05*in12_surge_3 + 4.54360262486936e-05*in12_surge_2 + 3.02906841657957e-05*in12_surge_1 + 7.57267104144893e-06*in12_surge
+	out12_surge = -0.999608555186179*out12_surge_2 - (-1.99472627971748)*out12_surge_1 + 0.00122056886717570*in12_surge_2 +0.00244113773435140*in12_surge_1 + 0.00122056886717570*in12_surge
 	out12_surge_4 = out12_surge_3
 	out12_surge_3 = out12_surge_2
 	out12_surge_2 = out12_surge_1
@@ -225,7 +229,7 @@ for x in range(0, 10000) :
 	
 	#Rate Limiter
 	rate_roll = (out12_roll-out_roll_coor)/(0.002)
-	rate_pitch = (out12_pitch-out_roll_coor)/(0.002)
+	rate_pitch = (out12_pitch-out_pitch_coor)/(0.002)
 	
 	if rate_roll>0.2 :
 		out_roll_coor = (0.002)*0.2 + out_roll_coor
@@ -258,7 +262,7 @@ for x in range(0, 10000) :
 		in22_pitch = in_pitch
 	
 	#Filter highpass W11
-	out11_roll = -0.910211320832731*out11_roll_4 -(-3.72646892562956)*out11_roll_3 - 5.72218913832976*out11_roll_2 - (-3.90592993040290)*out11_roll_1 + 1.00195626746846e-07*in11_roll_4 + 4.00782506987385e-07*in11_roll_3 + 6.01173760481077e-07*in11_roll_2 + 4.00782506987385e-07*in11_roll_1 + 1.00195626746846e-07*in11_roll
+	out11_roll = -0.910211320832731*out11_roll_4 -(-3.72646892562956)*out11_roll_3 - 5.72218913832976*out11_roll_2 - (-3.90592993040290)*out11_roll_1 + 0.954049957199685*in11_roll_4 + (-3.81619982879874)*in11_roll_3 + 5.72429974319811*in11_roll_2 + (-3.81619982879874)*in11_roll_1 + 0.954049957199685*in11_roll
 	out11_roll_4 = out11_roll_3
 	out11_roll_3 = out11_roll_2
 	out11_roll_2 = out11_roll_1
@@ -268,7 +272,7 @@ for x in range(0, 10000) :
 	in11_roll_2 = in11_roll_1
 	in11_roll_1 = in11_roll
 	
-	out11_pitch = -0.790353945979528*out11_pitch_4 -(-3.34726193634964)*out11_pitch_3 - 5.32182353393364*out11_pitch_2 - (-3.76485705728338)*out11_pitch_1 + 3.65539250921088e-06*in11_pitch_4 + 1.46215700368435e-05*in11_pitch_3 + 2.19323550552653e-05*in11_pitch_2 + 1.46215700368435e-05*in11_pitch_1 + 3.65539250921088e-06*in11_pitch
+	out11_pitch = -0.790353945979528*out11_pitch_4 -(-3.34726193634964)*out11_pitch_3 - 5.32182353393364*out11_pitch_2 - (-3.76485705728338)*out11_pitch_1 + 0.889018529596636*in11_pitch_4 + (-3.55607411838655)*in11_pitch_3 + 5.33411117757982*in11_pitch_2 + (-3.55607411838655)*in11_pitch_1 + 0.889018529596636*in11_pitch
 	out11_pitch_4 = out11_pitch_3
 	out11_pitch_3 = out11_pitch_2
 	out11_pitch_2 = out11_pitch_1
@@ -278,13 +282,11 @@ for x in range(0, 10000) :
 	in11_pitch_2 = in11_pitch_1
 	in11_pitch_1 = in11_pitch
 	
-	#Perlu integrator? input dari dinamika apa saja?
-	
 	#Perhitungan sudut roll dan pitch simulator (penjumlahan dari rotational (hasil integral?) dan coordination channel)
 	out_roll = out_roll_coor + out11_roll
 	out_pitch = out_pitch_coor + out11_pitch
 	
 	#Proses penulisan file
-	file.write(str(out22_surge) + '\t' + str(out22_sway) + '\t' + str(v_surge) + '\t' + str(v_sway) + '\t' + str(pos_surge) + '\t' + str(pos_sway) + '\t' + str(out_roll) + '\t' + str(out_pitch) +'\n')
+	file.write(str(out22_surge) + '\t' + str(out22_sway) + '\t' + str(v_surge) + '\t' + str(v_sway) + '\t' + str(pos_surge) + '\t' + str(pos_sway) + '\t' + str(out_roll) + '\t' + str(out_pitch) + '\t' + str(in_sway)  +'\n')
 	
 file.close()
